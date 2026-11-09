@@ -1,0 +1,72 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging and coverage outputs
+build/
+dist/
+*.egg-info/
+.eggs/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+!.env.template
+secrets/
+credentials/
+*.pem
+*.key
+
+# Editors and OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Temporary data and local scratch work
+tmp/
+temp/
+.cache/
+*.tmp
+~$*
+
+# LaTeX intermediate files (keep report source and final PDF)
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Do not ignore results/, CSV/JSON evidence, or final PDFs globally.
+# Keep experiment outputs intentionally selected for reproducibility.
