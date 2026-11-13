@@ -1,0 +1,5 @@
+# Keep source/evidence bytes stable when teammates clone on different systems.
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.txt text eol=lf

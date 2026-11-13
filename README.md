@@ -8,10 +8,34 @@ and a written security analysis.
 
 ## Project status
 
-This repository currently contains project documentation and Git configuration.
-The simulation, tests, and experimental results are **not implemented yet**.
-The directory layout below is a plan; run instructions will be added when the
-corresponding commands have been implemented and verified.
+Sơn's cryptographic component is implemented: canonical encoding, secure
+randomness generation, B0/B1/B2 commitments, M1 opening verification and bounded
+guessing utilities. Component tests, a small API example and a reproducible
+JSON check runner are available. See [the API contract](docs/commitment-api.md)
+and [the code handover](docs/son-code-handoff.md).
+
+The full auction coordinator, independent E01-E06 suite and final report are
+still pending. `docs/model.md` has not yet been supplied: the implementation
+uses the original study guide's encoding and does not impose a new auction bid
+range or identifier length limit. The team must reconcile it with approved M1
+before integration and official experiments.
+
+## Run the cryptographic component
+
+Python 3.10 or newer; standard library only. Run these commands from the
+repository root (on Windows, `py -3` can replace `python`):
+
+```sh
+python -m unittest discover -s tests -v
+python -m examples.commitment_demo
+python -m experiments.run_son_checks --output results/son_checks.json
+```
+
+The demo prints a public commit payload and then explicitly enters a simulated
+reveal step. It does not enforce auction deadlines. The JSON runner checks
+synthetic fixtures and records actual outputs, expected outputs, candidate
+counts, Python/platform details and source hashes. These are author checks;
+Chúc and Hoàng Anh still perform independent testing and reruns.
 
 ## Research questions
 
@@ -83,7 +107,7 @@ The weak-randomness configurations are experimental variants, not changes to M1.
 We will not attempt to exhaust a 128-bit random space or treat an unsuccessful
 search as proof of security.
 
-## Planned repository layout
+## Repository layout and remaining work
 
 ```text
 .
@@ -91,15 +115,18 @@ search as proof of security.
 ├── .gitignore
 ├── src/
 │   ├── commitment.py       # Encoding, randomness, commitment creation/verification
-│   └── auction.py          # Auction state and rule enforcement
-├── tests/                  # Independent functional and boundary tests
-├── experiments/            # Reproducible experiment configurations and runners
-├── results/                # Selected raw results and report-ready summaries
+│   └── auction.py          # PLANNED: auction state and rule enforcement
+├── tests/                  # Author component tests; independent auction suite pending
+├── examples/               # Normal commitment and explicit reveal API demo
+├── experiments/            # Guessing utilities and component evidence runner
+├── results/                # Recorded component checks; official results pending
 ├── docs/
-│   ├── model.md            # Approved M1 specification
-│   ├── experiment-plan.md  # Inputs, assumptions, expected behavior, limitations
-│   └── references.md       # Shared source notes and bibliography
-└── report/                 # Report source and figures
+│   ├── commitment-api.md   # Implemented byte format and integration contract
+│   ├── son-code-handoff.md # Scope, checks and reviewer handover
+│   ├── model.md            # PLANNED: approved M1 specification
+│   ├── experiment-plan.md  # PLANNED: team experiment design
+│   └── references.md       # PLANNED: shared source notes and bibliography
+└── report/                 # PLANNED: report source and figures
 ```
 
 ## Team responsibilities

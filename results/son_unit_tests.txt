@@ -1,0 +1,48 @@
+Python 3.13.2
+Command: python -m unittest discover -s tests -v
+
+test_b0_and_b1_against_independently_written_byte_strings (test_commitment.CommitmentTests.test_b0_and_b1_against_independently_written_byte_strings) ... ok
+test_changed_fields_fail_against_frozen_commitment (test_commitment.CommitmentTests.test_changed_fields_fail_against_frozen_commitment) ... ok
+test_delimiters_separate_ambiguous_identifier_pairs (test_commitment.CommitmentTests.test_delimiters_separate_ambiguous_identifier_pairs) ... ok
+test_deterministic_full_digest (test_commitment.CommitmentTests.test_deterministic_full_digest) ... ok
+test_fixture_override_does_not_generate_randomness (test_commitment.CommitmentTests.test_fixture_override_does_not_generate_randomness) ... ok
+test_identifiers_are_case_sensitive (test_commitment.CommitmentTests.test_identifiers_are_case_sensitive) ... ok
+test_invalid_bid_types_and_values_are_rejected (test_commitment.CommitmentTests.test_invalid_bid_types_and_values_are_rejected) ... ok
+test_invalid_fixture_does_not_silently_fall_back_to_randomness (test_commitment.CommitmentTests.test_invalid_fixture_does_not_silently_fall_back_to_randomness) ... ok
+test_invalid_identifiers_are_rejected_in_both_positions (test_commitment.CommitmentTests.test_invalid_identifiers_are_rejected_in_both_positions) ... ok
+test_malformed_digest_is_rejected (test_commitment.CommitmentTests.test_malformed_digest_is_rejected) ... ok
+test_malformed_opening_returns_false (test_commitment.CommitmentTests.test_malformed_opening_returns_false) ... ok
+test_noncanonical_randomness_is_rejected (test_commitment.CommitmentTests.test_noncanonical_randomness_is_rejected) ... ok
+test_normal_preparation_generates_randomness_and_retains_opening (test_commitment.CommitmentTests.test_normal_preparation_generates_randomness_and_retains_opening) ... ok
+test_price_range_policy_is_not_invented_by_crypto_module (test_commitment.CommitmentTests.test_price_range_policy_is_not_invented_by_crypto_module) ... ok
+test_public_payload_and_repr_do_not_disclose_opening (test_commitment.CommitmentTests.test_public_payload_and_repr_do_not_disclose_opening) ... ok
+test_published_m1_vector_and_exact_input_bytes (test_commitment.CommitmentTests.test_published_m1_vector_and_exact_input_bytes) ... ok
+test_randomness_uses_secrets_with_16_bytes (test_commitment.CommitmentTests.test_randomness_uses_secrets_with_16_bytes) ... ok
+test_real_randomness_has_required_format (test_commitment.CommitmentTests.test_real_randomness_has_required_format) ... ok
+test_valid_opening (test_commitment.CommitmentTests.test_valid_opening) ... ok
+test_zero_fixture_is_valid_format_not_a_claim_of_entropy (test_commitment.CommitmentTests.test_zero_fixture_is_valid_format_not_a_claim_of_entropy) ... ok
+test_absent_bid_exhausts_domain (test_guessing.GuessingTests.test_absent_bid_exhausts_domain) ... ok
+test_b0_recovers_bid_with_known_attempt_count (test_guessing.GuessingTests.test_b0_recovers_bid_with_known_attempt_count) ... ok
+test_b1_requires_reusable_bid_sequence (test_guessing.GuessingTests.test_b1_requires_reusable_bid_sequence) ... ok
+test_budget_stops_before_matching_candidate (test_guessing.GuessingTests.test_budget_stops_before_matching_candidate) ... ok
+test_disclosed_b1_r_reduces_search_to_bid_domain (test_guessing.GuessingTests.test_disclosed_b1_r_reduces_search_to_bid_domain) ... ok
+test_disclosed_b2_r_requires_matching_context (test_guessing.GuessingTests.test_disclosed_b2_r_requires_matching_context) ... ok
+test_domain_endpoints_are_included (test_guessing.GuessingTests.test_domain_endpoints_are_included) ... ok
+test_empty_b1_bid_domain_does_not_consume_randomness_iterator (test_guessing.GuessingTests.test_empty_b1_bid_domain_does_not_consume_randomness_iterator) ... ok
+test_empty_domain_has_zero_attempts (test_guessing.GuessingTests.test_empty_domain_has_zero_attempts) ... ok
+test_exact_budget_equal_to_domain_reports_exhaustion_correctly (test_guessing.GuessingTests.test_exact_budget_equal_to_domain_reports_exhaustion_correctly) ... ok
+test_invalid_budget_and_target_are_rejected (test_guessing.GuessingTests.test_invalid_budget_and_target_are_rejected) ... ok
+test_match_on_last_allowed_attempt (test_guessing.GuessingTests.test_match_on_last_allowed_attempt) ... ok
+test_missing_r_candidate_exhausts_pairs (test_guessing.GuessingTests.test_missing_r_candidate_exhausts_pairs) ... ok
+test_one_shot_b0_candidate_iterator_is_supported (test_guessing.GuessingTests.test_one_shot_b0_candidate_iterator_is_supported) ... ok
+test_weak_fixture_generation_is_bounded_and_repeatable (test_guessing.GuessingTests.test_weak_fixture_generation_is_bounded_and_repeatable) ... ok
+test_weak_r_uses_explicit_small_domain_and_search_order (test_guessing.GuessingTests.test_weak_r_uses_explicit_small_domain_and_search_order) ... ok
+test_demo_discloses_opening_only_after_reveal_marker (test_runner.RunnerTests.test_demo_discloses_opening_only_after_reveal_marker) ... ok
+test_recorded_cases_match_expectations_and_do_not_export_normal_r (test_runner.RunnerTests.test_recorded_cases_match_expectations_and_do_not_export_normal_r) ... ok
+test_runner_cli_writes_readable_evidence (test_runner.RunnerTests.test_runner_cli_writes_readable_evidence) ... ok
+test_runner_returns_failure_exit_code_for_failed_check (test_runner.RunnerTests.test_runner_returns_failure_exit_code_for_failed_check) ... ok
+
+----------------------------------------------------------------------
+Ran 40 tests in 0.666s
+
+OK
