@@ -1,0 +1,89 @@
+{
+  "case": "E01",
+  "T1": 36000,
+  "T2": 36600,
+  "commits": {
+    "U01": {
+      "accepted": true,
+      "reason": null,
+      "receipt": {
+        "auction_id": "A01",
+        "bidder_id": "U01",
+        "commitment": "037b0bae30968e13e513184a0284dfccdf1682ef18f69bdc49c526c72ae88374",
+        "received_at": 35999
+      }
+    },
+    "U02": {
+      "accepted": true,
+      "reason": null,
+      "receipt": {
+        "auction_id": "A01",
+        "bidder_id": "U02",
+        "commitment": "cf9a57260973faead5ebb4e3d41585f77110a5bd3a21182d1d72df1571a64773",
+        "received_at": 35999
+      }
+    },
+    "U03": {
+      "accepted": true,
+      "reason": null,
+      "receipt": {
+        "auction_id": "A01",
+        "bidder_id": "U03",
+        "commitment": "1f7a334ea17a55fc6bd9263c0cdb9277fc8d1d95a4faf23d0084498fe724ce34",
+        "received_at": 35999
+      }
+    }
+  },
+  "reveals": {
+    "U01": {
+      "bid": 100000,
+      "received_at": 36000,
+      "accepted": true,
+      "reason": null,
+      "receipt": null
+    },
+    "U02": {
+      "bid": 130000,
+      "received_at": 36000,
+      "accepted": true,
+      "reason": null,
+      "receipt": null
+    },
+    "U03": {
+      "bid": 120000,
+      "received_at": 36000,
+      "accepted": true,
+      "reason": null,
+      "receipt": null
+    }
+  },
+  "settlement": {
+    "status": "winner",
+    "winner_id": "U02",
+    "price": 130000
+  },
+  "run_kind": "author integration check",
+  "run_at_utc": "2026-11-14T15:48:41.375256+00:00",
+  "git_head": "5e05ee5932531315b199a98ff0384897f9490a90",
+  "environment": {
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "config": {
+    "min_bid": 10000,
+    "max_bid": 1000000,
+    "bid_step": 10000
+  },
+  "randomness": "fresh secret 128-bit randomness per bidder",
+  "expected_settlement": {
+    "status": "winner",
+    "winner_id": "U02",
+    "price": 130000
+  },
+  "all_checks_passed": true,
+  "source_sha256": {
+    "src/commitment.py": "fbcf30321d6a9e0bef1ffd42940473d71c506dca7e268ca889e26a59323730fc",
+    "src/auction.py": "365bc3d80ab45bc9b42db68ba6c2c15362c69ec8bbc294e1d04a084244abcfe2",
+    "examples/auction_demo.py": "bf8fcae8e27c2f408db896999c0afee2e52a109c12c544d6be7440e60ff675f6"
+  }
+}
