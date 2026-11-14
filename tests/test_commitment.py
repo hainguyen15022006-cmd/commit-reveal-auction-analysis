@@ -3,29 +3,38 @@ import unittest
 from unittest.mock import patch
 
 from src.commitment import (
-    InvalidCommitmentData, create_b0_commitment, create_b1_commitment,
+    InvalidCommitmentData, MAX_BID, create_b0_commitment, create_b1_commitment,
     create_commitment, encode, encode_b0, encode_b1, generate_randomness,
     prepare_commitment, validate_commitment, verify_opening,
 )
 
 
 class CommitmentTests(unittest.TestCase):
-    # Public, patterned randomness from study guide pages 6 and 8; TEST ONLY.
+    # Public patterned TEST fixture; binary digest independently checked with .NET.
     R = "00112233445566778899aabbccddeeff"
-    VECTOR = "2468ab327de725704949ff21b4e58ef38cf7ee100a634951593ea494e3f2f544"
-    MESSAGE = b"CR-AUCTION-v1|A01|U01|VND|100000|00112233445566778899aabbccddeeff"
+    VECTOR = "7b4df9d0ff820790c1ef5c2e89ec7b7c7900525b2bdb526abe0b49e187fd2b71"
+    MESSAGE = bytes.fromhex(
+        "0000000d43522d41554354494f4e2d7631"
+        "00000003413031"
+        "00000003553031"
+        "00000003564e44"
+        "0000000800000000000186a0"
+        "0000001000112233445566778899aabbccddeeff"
+    )
 
-    def test_published_m1_vector_and_exact_input_bytes(self):
+    def test_binary_m1_vector_and_exact_input_bytes(self):
         self.assertEqual(encode("A01", "U01", 100000, self.R), self.MESSAGE)
+        self.assertEqual(len(self.MESSAGE), 70)
         self.assertEqual(create_commitment("A01", "U01", 100000, self.R), self.VECTOR)
 
     def test_b0_and_b1_against_independently_written_byte_strings(self):
-        self.assertEqual(encode_b0(100000), b"100000")
-        self.assertEqual(encode_b1(100000, self.R),
-                         b"100000|00112233445566778899aabbccddeeff")
-        self.assertEqual(create_b0_commitment(100000), hashlib.sha256(b"100000").hexdigest())
+        b0 = bytes.fromhex("00000000000186a0")
+        b1 = bytes.fromhex("0000000800000000000186a00000001000112233445566778899aabbccddeeff")
+        self.assertEqual(encode_b0(100000), b0)
+        self.assertEqual(encode_b1(100000, self.R), b1)
+        self.assertEqual(create_b0_commitment(100000), hashlib.sha256(b0).hexdigest())
         self.assertEqual(create_b1_commitment(100000, self.R),
-                         hashlib.sha256(b"100000|00112233445566778899aabbccddeeff").hexdigest())
+                         hashlib.sha256(b1).hexdigest())
 
     def test_deterministic_full_digest(self):
         self.assertEqual(create_commitment("A01", "U01", 100000, self.R), self.VECTOR)
@@ -45,12 +54,38 @@ class CommitmentTests(unittest.TestCase):
             with self.subTest(fields=fields[:3]):
                 self.assertFalse(verify_opening(self.VECTOR, *fields))
 
-    def test_delimiters_separate_ambiguous_identifier_pairs(self):
+    def test_length_prefixes_separate_ambiguous_identifier_pairs(self):
         first = encode("1", "23", 100000, self.R)
         second = encode("12", "3", 100000, self.R)
         self.assertNotEqual(first, second)
-        self.assertEqual(first.split(b"|")[1:3], [b"1", b"23"])
-        self.assertEqual(second.split(b"|")[1:3], [b"12", b"3"])
+        self.assertIn(b"\x00\x00\x00\x011\x00\x00\x00\x0223", first)
+        self.assertIn(b"\x00\x00\x00\x0212\x00\x00\x00\x013", second)
+
+    def test_each_field_has_a_byte_length_prefix_including_bid_and_r(self):
+        data = encode("A01", "U01", 100000, self.R)
+        offset = 0
+        fields = []
+        while offset < len(data):
+            length = int.from_bytes(data[offset:offset + 4], "big")
+            offset += 4
+            fields.append(data[offset:offset + length])
+            offset += length
+        self.assertEqual(offset, len(data))
+        self.assertEqual(fields, [b"CR-AUCTION-v1", b"A01", b"U01", b"VND",
+                                  bytes.fromhex("00000000000186a0"), bytes.fromhex(self.R)])
+
+    def test_old_ascii_commitment_is_not_accepted_by_binary_verifier(self):
+        old = "2468ab327de725704949ff21b4e58ef38cf7ee100a634951593ea494e3f2f544"
+        self.assertFalse(verify_opening(old, "A01", "U01", 100000, self.R))
+
+    def test_unsigned_64_bit_representation_boundary(self):
+        self.assertEqual(encode_b0(MAX_BID), b"\xff" * 8)
+        self.assertTrue(verify_opening(create_commitment("A01", "U01", MAX_BID, self.R),
+                                      "A01", "U01", MAX_BID, self.R))
+        for value in (MAX_BID + 1, 1 << 100):
+            with self.assertRaises(InvalidCommitmentData):
+                encode("A01", "U01", value, self.R)
+            self.assertFalse(verify_opening(self.VECTOR, "A01", "U01", value, self.R))
 
     def test_identifiers_are_case_sensitive(self):
         self.assertNotEqual(encode("A01", "U01", 100000, self.R),
@@ -68,7 +103,7 @@ class CommitmentTests(unittest.TestCase):
         # Positive integers outside the illustrative domain remain encodable.
         # The auction layer must enforce its actual min/max/step constraints.
         for bid in (1, 10001, 1000001):
-            self.assertIn(str(bid).encode("ascii"), encode("A01", "U01", bid, self.R))
+            self.assertIn(bid.to_bytes(8, "big"), encode("A01", "U01", bid, self.R))
 
     def test_invalid_bid_types_and_values_are_rejected(self):
         for bid in (True, False, 0, -1, 100000.0, "100000", "0100000", None):
@@ -88,7 +123,7 @@ class CommitmentTests(unittest.TestCase):
                     encode_b1(100000, r)
 
     def test_zero_fixture_is_valid_format_not_a_claim_of_entropy(self):
-        self.assertTrue(encode("A01", "U01", 100000, "0" * 32).endswith(b"0" * 32))
+        self.assertTrue(encode("A01", "U01", 100000, "0" * 32).endswith(b"\x00" * 16))
 
     def test_malformed_digest_is_rejected(self):
         for digest in ("", self.VECTOR[:-1], self.VECTOR + "0", self.VECTOR.upper(),

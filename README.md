@@ -14,11 +14,13 @@ guessing utilities. Component tests, a small API example and a reproducible
 JSON check runner are available. See [the API contract](docs/commitment-api.md)
 and [the code handover](docs/son-code-handoff.md).
 
-The full auction coordinator, independent E01-E06 suite and final report are
-still pending. `docs/model.md` has not yet been supplied: the implementation
-uses the original study guide's encoding and does not impose a new auction bid
-range or identifier length limit. The team must reconcile it with approved M1
-before integration and official experiments.
+This checkout now uses the binary encoding described in Thành Lê's integration
+message: four-byte lengths for all fields, an eight-byte unsigned bid and 16 raw
+random bytes. The external API represents r and commitments as lowercase hex
+strings. Older ASCII-pipe commitments are incompatible; recreate the fixtures.
+The coordinator's temporary source and final `docs/model.md` have not been
+supplied here. Thành Lê will integrate this handover and rerun E01; Chúc's
+independent full-auction suite and the team's final report remain separate work.
 
 ## Run the cryptographic component
 
@@ -28,7 +30,8 @@ repository root (on Windows, `py -3` can replace `python`):
 ```sh
 python -m unittest discover -s tests -v
 python -m examples.commitment_demo
-python -m experiments.run_son_checks --output results/son_checks.json
+python -m examples.check_handover
+python -m experiments.run_son_checks --output results/son_checks_binary.json
 ```
 
 The demo prints a public commit payload and then explicitly enters a simulated

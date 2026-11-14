@@ -6,13 +6,19 @@ the report's Background section.
 
 ## Model status
 
-The repository currently has no approved `docs/model.md`. The implementation
-follows the byte format on page 6 of `02_Huong_dan_hoc_Commit_Reveal.pdf` and
-the M1 formula already in the README. It does not declare the earlier Day 1
-review approved, adopt its proposed 32-character identifier bound, or make the
-100-price example a mandatory auction rule. Reconcile the API with the team's
-approved model before integration; keep code, tests and documentation together
-if that model uses a different encoding.
+This handover implements `m1-length-prefixed-be-v1`, following Thành Lê's
+integration message of 14 November 2026. Each M1 field has a four-byte
+big-endian byte-length prefix; the bid has eight unsigned big-endian bytes and
+r has 16 raw bytes. The complete contract below fixes field order and API types.
+The actual temporary auction source has not been supplied, so Thành Lê must
+replace its module, compare the reference vector and rerun E01 before Chúc's
+independent tests. No full-auction integration result is claimed here.
+
+This replaces the earlier ASCII pipe encoding. Previously created commitments
+are incompatible and must be recreated; the verifier does not auto-detect or
+accept the old format. B0 and B1 also use the binary field representations
+specified below. The 100-price example remains an experiment configuration,
+not a global price rule. The team still maintains the final `docs/model.md`.
 
 ## Runtime and files
 
@@ -30,27 +36,36 @@ Run module commands from the repository root. Imports use `src.commitment`.
 | --- | --- |
 | `auction_id` / A | Nonempty, case-sensitive ASCII letters or digits |
 | `bidder_id` / U | Same format as A; caller verifies authenticated identity |
-| `bid` / b | Positive `int`; `bool`, floats and numeric strings are rejected |
+| `bid` / b | `int` in 1..2^64-1; `bool`, floats and numeric strings are rejected |
 | `randomness` / r | Exactly 32 lowercase hexadecimal digits, representing 16 bytes |
 | Commitment c | Exactly 64 lowercase hexadecimal digits, the full 32-byte digest |
 
 The tag is exactly `CR-AUCTION-v1`; the currency is exactly `VND`.
 
 ```text
-B0 input: ASCII decimal b
-B1 input: b|r
-B2 input: CR-AUCTION-v1|A|U|VND|b|r
+LP(x) = len(x).to_bytes(4, "big", signed=False) + x
+bid_bytes = b.to_bytes(8, "big", signed=False)
+r_bytes = bytes.fromhex(r)
+
+B0 input: bid_bytes
+B1 input: LP(bid_bytes) + LP(r_bytes)
+B2 input: LP(b"CR-AUCTION-v1") + LP(A.encode("ascii"))
+        + LP(U.encode("ascii")) + LP(b"VND")
+        + LP(bid_bytes) + LP(r_bytes)
 ```
 
-All hash inputs are ASCII bytes. There is no BOM, whitespace, trailing newline,
-numeric grouping, sign or leading zero in the decimal bid. Leading zeros in
-the fixed-width randomness field are retained. User-supplied identifiers cannot
-contain a pipe. Noncanonical fields are rejected instead of silently normalized.
-The field restrictions make accepted records unambiguous; a hash cannot repair
-ambiguous serialization.
+All six M1 fields, including bid and r, have a length prefix. Text fields use
+ASCII; UTF-8 produces the same bytes for the accepted ASCII identifier domain.
+There are no literal pipe separators or trailing newline. Lengths count bytes,
+not hexadecimal characters. The price field is always eight bytes, and leading
+zero bytes in both numeric and randomness fields are retained. Field lengths
+must fit unsigned 32 bits. Auction-specific price min/max/step constraints and
+identifier bounds are checked by the auction coordinator.
 
-No min/max/step auction policy or identifier length limit is introduced here.
-The auction coordinator enforces the approved model's additional constraints.
+**API boundary:** r is still a 32-character lowercase hex `str`, and c is a
+64-character lowercase hex `str`. The module converts r to raw bytes internally.
+If the temporary coordinator stores r as `bytes`, call with `raw_r.hex()`.
+Do not pass `r.encode()` or pre-encode the bid. Generated r is also a hex string.
 
 ## Function contract
 
@@ -112,16 +127,26 @@ with `dataclasses.asdict`) during commit. No component function logs secrets.
 
 ## Reference vector and negative samples
 
-This is the public fixed fixture from study guide pages 6 and 8. Its patterned
-randomness is unsuitable as a real secret.
+The input values reuse the public fixture from study guide pages 6 and 8, but
+the binary encoding produces a NEW digest. Its patterned randomness is for
+tests only. The digest has been cross-checked using Python and .NET SHA-256.
 
 ```text
 A = A01
 U = U01
 b = 100000
 r = 00112233445566778899aabbccddeeff
-input = CR-AUCTION-v1|A01|U01|VND|100000|00112233445566778899aabbccddeeff
-c = 2468ab327de725704949ff21b4e58ef38cf7ee100a634951593ea494e3f2f544
+tag = CR-AUCTION-v1
+currency = VND
+input length = 70 bytes
+input hex (join the following lines without spaces):
+0000000d43522d41554354494f4e2d7631
+00000003413031
+00000003553031
+00000003564e44
+0000000800000000000186a0
+0000001000112233445566778899aabbccddeeff
+c = 7b4df9d0ff820790c1ef5c2e89ec7b7c7900525b2bdb526abe0b49e187fd2b71
 ```
 
 The same c opens successfully with these fields. Keeping c fixed and changing
@@ -179,7 +204,7 @@ and winner selection. Công Thành reviews cryptographic assumptions and the
 experiment design; Chúc independently tests and executes the agreed cases.
 Hoàng Anh reruns the documented commands on another environment.
 
-Source references for implementation choices are the original study guide,
-the group's README and `04_Phan_cong_bo_sung_code_giu_nguyen_M1.pdf`, pages 2,
-3 and 5-7. This interface document does not approve a new model or claim the
-full E01-E06 auction suite has been completed.
+The original study guide, the group's README and the supplementary assignment
+define the conceptual scope. Thành Lê's integration message supplies the new
+binary encoding. This document records the exact interface for integration;
+it does not claim the full E01-E06 auction suite has been completed.

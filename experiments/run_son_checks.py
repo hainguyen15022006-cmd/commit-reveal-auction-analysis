@@ -22,7 +22,7 @@ from src.commitment import (
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_R = "00112233445566778899aabbccddeeff"
-REFERENCE_DIGEST = "2468ab327de725704949ff21b4e58ef38cf7ee100a634951593ea494e3f2f544"
+REFERENCE_DIGEST = "7b4df9d0ff820790c1ef5c2e89ec7b7c7900525b2bdb526abe0b49e187fd2b71"
 
 
 def _git(*args: str) -> str | None:
@@ -57,7 +57,7 @@ def run_checks() -> dict:
     commitment = create_commitment("A01", "U01", 100000, FIXTURE_R)
     opening = {"auction_id": "A01", "bidder_id": "U01", "bid": 100000,
                "randomness": FIXTURE_R, "randomness_kind": "public fixed TEST fixture"}
-    record("C01-vector", "Check the study-guide SHA-256 reference vector", opening,
+    record("C01-vector", "Check the binary integration SHA-256 reference vector", opening,
            {"digest": REFERENCE_DIGEST}, {"digest": commitment},
            "A known-answer check verifies one encoding/hash vector, not protocol security.")
     for case_id, bid, r, expected in (
@@ -139,10 +139,10 @@ def run_checks() -> dict:
         "git_head": _git("rev-parse", "HEAD"),
         "working_tree_dirty": None if status is None else bool(status),
         "source_sha256": source_manifest(), "encoding_id": ENCODING_ID,
-        "reference_vector_source": "02_Huong_dan_hoc_Commit_Reveal.pdf, pages 6 and 8",
+        "reference_vector_source": "docs/commitment-api.md; binary vector independently checked with .NET SHA-256",
         "model_status": ("docs/model.md exists; its approval and conformance require team review."
                          if (ROOT / "docs/model.md").is_file() else
-                         "Study-guide encoding implemented; team-approved docs/model.md is not yet present."),
+                         "Binary handover format implemented from the integration message; docs/model.md is not yet present."),
         "model_sha256": (hashlib.sha256((ROOT / "docs/model.md").read_bytes()).hexdigest()
                          if (ROOT / "docs/model.md").is_file() else None),
         "all_checks_passed": all(case["passed"] for case in cases), "cases": cases,

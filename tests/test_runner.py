@@ -13,6 +13,13 @@ from src.commitment import prepare_commitment
 
 
 class RunnerTests(unittest.TestCase):
+    def test_handover_check_runs_from_repository(self):
+        run = subprocess.run([sys.executable, "-m", "examples.check_handover"],
+                             cwd=ROOT, capture_output=True, text=True, timeout=10)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertNotIn("FAIL:", run.stdout)
+        self.assertEqual(run.stdout.count("PASS:"), 8)
+
     def test_recorded_cases_match_expectations_and_do_not_export_normal_r(self):
         secret_fixture = "f1" * 16
         prepared = prepare_commitment("A01", "U03", 120000, randomness=secret_fixture)
