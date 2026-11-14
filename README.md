@@ -20,7 +20,8 @@ random bytes. The external API represents r and commitments as lowercase hex
 strings. Older ASCII-pipe commitments are incompatible; recreate the fixtures.
 The coordinator's temporary source and final `docs/model.md` have not been
 supplied here. Thành Lê will integrate this handover and rerun E01; Chúc's
-independent full-auction suite and the team's final report remain separate work.
+independent full-auction suite remains separate work. Sơn's English Background
+draft and Vietnamese reading copy are available in `report/` for team review.
 
 ## Run the cryptographic component
 
@@ -129,7 +130,9 @@ search as proof of security.
 │   ├── model.md            # PLANNED: approved M1 specification
 │   ├── experiment-plan.md  # PLANNED: team experiment design
 │   └── references.md       # PLANNED: shared source notes and bibliography
-└── report/                 # PLANNED: report source and figures
+└── report/
+    ├── background_en.md    # Sơn's English Background draft
+    └── background_vi.md    # Vietnamese reading copy for review
 ```
 
 ## Team responsibilities
