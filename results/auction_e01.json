@@ -1,0 +1,79 @@
+{
+  "case": "E01",
+  "T1": 36000,
+  "T2": 36600,
+  "commits": {
+    "U01": {
+      "accepted": true,
+      "reason": null,
+      "receipt": {
+        "auction_id": "A01",
+        "bidder_id": "U01",
+        "commitment": "aa2a59debd9a0ef7a11b4dbadd5bc3ad255b1ecc030058c07ad68868721ccf00",
+        "received_at": 35999
+      }
+    },
+    "U02": {
+      "accepted": true,
+      "reason": null,
+      "receipt": {
+        "auction_id": "A01",
+        "bidder_id": "U02",
+        "commitment": "f91389bef8447a37f912fd3a84e5649511e205d0f7e912eab8067d05061a5016",
+        "received_at": 35999
+      }
+    },
+    "U03": {
+      "accepted": true,
+      "reason": null,
+      "receipt": {
+        "auction_id": "A01",
+        "bidder_id": "U03",
+        "commitment": "ce6393029ab4d19a5b6db5c7a77482274a14f335b7549cb304cd51786fa53247",
+        "received_at": 35999
+      }
+    }
+  },
+  "reveals": {
+    "U01": {
+      "bid": 100000,
+      "received_at": 36000,
+      "accepted": true,
+      "reason": null,
+      "receipt": null
+    },
+    "U02": {
+      "bid": 130000,
+      "received_at": 36000,
+      "accepted": true,
+      "reason": null,
+      "receipt": null
+    },
+    "U03": {
+      "bid": 120000,
+      "received_at": 36000,
+      "accepted": true,
+      "reason": null,
+      "receipt": null
+    }
+  },
+  "settlement": {
+    "status": "winner",
+    "winner_id": "U02",
+    "price": 130000
+  },
+  "environment": {
+    "python": "3.13.2",
+    "platform": "Windows"
+  },
+  "source_sha256": {
+    "src/commitment.py": "fbcf30321d6a9e0bef1ffd42940473d71c506dca7e268ca889e26a59323730fc",
+    "src/auction.py": "86e52ac08b5194c6b7854c6fd2ea8dad027925eb07f77435ba07a21f4996192d",
+    "examples/auction_demo.py": "e7513643075ac330b6a0262b4865954b3564235080112298333587beb8513fdc"
+  },
+  "expected_settlement": {
+    "status": "winner",
+    "winner_id": "U02",
+    "price": 130000
+  }
+}

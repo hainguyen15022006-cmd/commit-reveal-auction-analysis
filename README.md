@@ -18,25 +18,26 @@ This checkout now uses the binary encoding described in Thành Lê's integration
 message: four-byte lengths for all fields, an eight-byte unsigned bid and 16 raw
 random bytes. The external API represents r and commitments as lowercase hex
 strings. Older ASCII-pipe commitments are incompatible; recreate the fixtures.
-The coordinator's temporary source and final `docs/model.md` have not been
-supplied here. Thành Lê will integrate this handover and rerun E01; Chúc's
-independent full-auction suite remains separate work. Sơn's English Background
-draft and Vietnamese reading copy are available in `report/` for team review.
+The integrated M1 auction uses Sơn's commitment API. See the [M1 specification](docs/model.md)
+and [protocol description with diagram](report/protocol_description_en.md).
+The coordinator checks cover E01, E02, E05 and E06. Chúc's independent tests remain separate.
+Sơn's Background drafts are available in `report/` for team review.
 
-## Run the cryptographic component
+## Run the M1 simulation and component checks
 
 Python 3.10 or newer; standard library only. Run these commands from the
 repository root (on Windows, `py -3` can replace `python`):
 
 ```sh
+python -m examples.auction_demo
 python -m unittest discover -s tests -v
 python -m examples.commitment_demo
 python -m examples.check_handover
 python -m experiments.run_son_checks --output results/son_checks_binary.json
 ```
 
-The demo prints a public commit payload and then explicitly enters a simulated
-reveal step. It does not enforce auction deadlines. The JSON runner checks
+The auction demo runs E01 and prints receipts, accepted reveals and the outcome as JSON.
+The commitment-only demo illustrates the separate cryptographic API. The JSON runner checks
 synthetic fixtures and records actual outputs, expected outputs, candidate
 counts, Python/platform details and source hashes. These are author checks;
 Chúc and Hoàng Anh still perform independent testing and reruns.
@@ -52,8 +53,7 @@ Chúc and Hoàng Anh still perform independent testing and reruns.
 
 The main model, **M1**, is a first-price sealed-bid auction for one item.
 Each authenticated bidder may submit one commitment. Among valid reveals,
-the highest bid wins and pays its own bid. The finalized M1 document will be
-maintained in `docs/model.md` as the team's shared specification.
+the highest bid wins and pays its own bid. See the [M1 specification](docs/model.md) for the shared rules.
 
 The commitment construction is:
 
@@ -119,19 +119,20 @@ search as proof of security.
 ├── .gitignore
 ├── src/
 │   ├── commitment.py       # Encoding, randomness, commitment creation/verification
-│   └── auction.py          # PLANNED: auction state and rule enforcement
-├── tests/                  # Author component tests; independent auction suite pending
+│   └── auction.py          # M1 auction state and rule enforcement
+├── tests/                  # Component and coordinator integration tests
 ├── examples/               # Normal commitment and explicit reveal API demo
 ├── experiments/            # Guessing utilities and component evidence runner
 ├── results/                # Recorded component checks; official results pending
 ├── docs/
 │   ├── commitment-api.md   # Implemented byte format and integration contract
 │   ├── son-code-handoff.md # Scope, checks and reviewer handover
-│   ├── model.md            # PLANNED: approved M1 specification
+│   ├── model.md            # M1 specification
 │   ├── experiment-plan.md  # PLANNED: team experiment design
 │   └── references.md       # PLANNED: shared source notes and bibliography
 └── report/
     ├── background_en.md    # Sơn's English Background draft
+    ├── protocol_description_en.md # M1 description and diagram
     └── background_vi.md    # Vietnamese reading copy for review
 ```
 
