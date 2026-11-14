@@ -30,6 +30,7 @@ repository root (on Windows, `py -3` can replace `python`):
 
 ```sh
 python -m examples.auction_demo
+python -m examples.auction_demo --output results/auction_e01.json
 python -m unittest discover -s tests -v
 python -m examples.commitment_demo
 python -m examples.check_handover
@@ -37,6 +38,8 @@ python -m experiments.run_son_checks --output results/son_checks_binary.json
 ```
 
 The auction demo runs E01 and prints receipts, accepted reveals and the outcome as JSON.
+The output option also writes run metadata and source hashes for report evidence.
+See [Thành Lê's report handoff](docs/thanh-le-report-handoff.md) for the final text and figure.
 The commitment-only demo illustrates the separate cryptographic API. The JSON runner checks
 synthetic fixtures and records actual outputs, expected outputs, candidate
 counts, Python/platform details and source hashes. These are author checks;

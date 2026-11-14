@@ -1,0 +1,4 @@
+flowchart LR
+    C["Commit<br/>t &lt; T1<br/>Submit A, U, c"] --> F["Freeze<br/>t = T1<br/>Fix commitment list"]
+    F --> R["Reveal<br/>T1 ≤ t &lt; T2<br/>Check b, r"]
+    R --> S["Settle<br/>t ≥ T2<br/>Select highest valid bid"]
