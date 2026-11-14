@@ -4,10 +4,10 @@
   "run_kind": "independent tests E01-E06 (oracle written separately from src/)",
   "scope_note": "Independent functional checks and bounded experiments. E01/E05/E06 show that the simulation enforces docs/model.md; E02-E04 illustrate behavior on specific cases. None of this proves hiding or binding.",
   "run_by": "Chuc",
-  "run_started_at_utc": "2026-11-14T09:22:58.608596+00:00",
+  "run_started_at_utc": "2026-11-14T09:34:44.017955+00:00",
   "python_version": "3.14.2",
   "platform": "Windows-11-10.0.26200-SP0",
-  "git_head": "2a1bfe475b9f22cad2eab078e48129544aca24d2",
+  "git_head": "03d0b55f3d3fbc6b3212b6ac777e920fbaf03223",
   "git_branch": "test/independent-e01-e06",
   "working_tree_dirty": false,
   "source_sha256": {
@@ -65,7 +65,7 @@
       "id": "E01-b",
       "test": "tests.test_independent_e01_e06.E01ValidFlow.test_E01_b_valid_flow_fresh_secure_r",
       "status": "pass",
-      "seconds": 0.0003,
+      "seconds": 0.0002,
       "observed": {
         "winner": "U02",
         "price": 130000,
@@ -76,7 +76,7 @@
       "id": "E01-c",
       "test": "tests.test_independent_e01_e06.E01ValidFlow.test_E01_c_same_inputs_reproduce_same_result",
       "status": "pass",
-      "seconds": 0.0003,
+      "seconds": 0.0004,
       "observed": {
         "reproduced": true
       }
@@ -105,7 +105,7 @@
       "id": "E02-b",
       "test": "tests.test_independent_e01_e06.E02WrongOpening.test_E02_b_changed_bid_rejected_r_unchanged",
       "status": "pass",
-      "seconds": 0.0002,
+      "seconds": 0.0001,
       "observed": {
         "samples": 5,
         "accepted_count": 0,
@@ -116,7 +116,7 @@
       "id": "E02-c",
       "test": "tests.test_independent_e01_e06.E02WrongOpening.test_E02_c_changed_r_rejected_bid_unchanged",
       "status": "pass",
-      "seconds": 0.0013,
+      "seconds": 0.0012,
       "observed": {
         "samples": 128,
         "accepted_count": 0,
@@ -127,7 +127,7 @@
       "id": "E02-d",
       "test": "tests.test_independent_e01_e06.E02WrongOpening.test_E02_d_changed_bid_and_r_rejected",
       "status": "pass",
-      "seconds": 0.0002,
+      "seconds": 0.0001,
       "observed": {
         "samples": 4,
         "accepted_count": 0
@@ -160,7 +160,7 @@
       "id": "E03-a",
       "test": "tests.test_independent_e01_e06.E03GuessB0.test_E03_a_b0_recovers_every_bid_in_domain",
       "status": "pass",
-      "seconds": 0.0122,
+      "seconds": 0.0097,
       "observed": {
         "domain_size": 100,
         "recovered": 100,
@@ -173,7 +173,7 @@
       "id": "E03-b",
       "test": "tests.test_independent_e01_e06.E03GuessB0.test_E03_b_same_search_fails_against_m1_commitments",
       "status": "pass",
-      "seconds": 0.0319,
+      "seconds": 0.0212,
       "observed": {
         "commitments_tried": 100,
         "recovered": 0,
@@ -185,7 +185,7 @@
       "id": "E03-c",
       "test": "tests.test_independent_e01_e06.E03GuessB0.test_E03_c_result_depends_on_domain_and_budget",
       "status": "pass",
-      "seconds": 0.001,
+      "seconds": 0.0004,
       "observed": {
         "outside_domain": "domain_exhausted after 100",
         "budget_12": "budget_exhausted",
@@ -196,7 +196,7 @@
       "id": "E04-a",
       "test": "tests.test_independent_e01_e06.E04RoleOfRandomness.test_E04_a_without_r_equal_bids_give_equal_commitments",
       "status": "pass",
-      "seconds": 0.0003,
+      "seconds": 0.0005,
       "observed": {
         "b0_equal_bids_equal_commitments": true,
         "m1_equal_bids_equal_commitments": false,
@@ -207,7 +207,7 @@
       "id": "E04-b",
       "test": "tests.test_independent_e01_e06.E04RoleOfRandomness.test_E04_b_weak_8_bit_r_is_found_in_bounded_search",
       "status": "pass",
-      "seconds": 0.1017,
+      "seconds": 0.1169,
       "observed": {
         "r_bits": 8,
         "search_space": 25600,
@@ -221,13 +221,13 @@
       "id": "E04-c",
       "test": "tests.test_independent_e01_e06.E04RoleOfRandomness.test_E04_c_128_bit_r_configuration_only_no_exhaustive_search",
       "status": "pass",
-      "seconds": 0.1572,
+      "seconds": 0.1765,
       "observed": {
         "r_bits": 128,
         "draws": 5000,
         "duplicates": 0,
-        "measured_hashes_per_second": 465400,
-        "estimated_years_for_2_pow_128": "2.317e+25",
+        "measured_hashes_per_second": 409984,
+        "estimated_years_for_2_pow_128": "2.630e+25",
         "random_guesses": 20000,
         "hits": 0,
         "note": "configuration check and arithmetic; no exhaustive search attempted and zero hits in a small sample is not a proof of security"
@@ -237,7 +237,7 @@
       "id": "E04-d",
       "test": "tests.test_independent_e01_e06.E04RoleOfRandomness.test_E04_d_disclosed_r_allows_small_domain_recovery",
       "status": "pass",
-      "seconds": 0.001,
+      "seconds": 0.0011,
       "observed": {
         "attempts_with_disclosed_r": 13,
         "recovered_bid": 130000,
@@ -272,7 +272,7 @@
       "id": "E05-c",
       "test": "tests.test_independent_e01_e06.E05SessionRules.test_E05_c_commit_one_second_before_T1_accepted",
       "status": "pass",
-      "seconds": 0.0001,
+      "seconds": 0.0002,
       "observed": {
         "commit_at_T1_minus_1": "accepted",
         "receipt_time": 35999
@@ -282,7 +282,7 @@
       "id": "E05-d",
       "test": "tests.test_independent_e01_e06.E05SessionRules.test_E05_d_reveal_before_T1_rejected_then_retry_accepted",
       "status": "pass",
-      "seconds": 0.0001,
+      "seconds": 0.0002,
       "observed": {
         "reveal_at_T1_minus_1": "reveal_not_open",
         "retry_at_T1": "accepted"
@@ -301,7 +301,7 @@
       "id": "E05-f",
       "test": "tests.test_independent_e01_e06.E05SessionRules.test_E05_f_reveal_at_T2_rejected_T2_minus_1_accepted",
       "status": "pass",
-      "seconds": 0.0002,
+      "seconds": 0.0001,
       "observed": {
         "reveal_at_T2_minus_1": "accepted",
         "reveal_at_T2": "reveal_closed",
@@ -323,7 +323,7 @@
       "id": "E05-h",
       "test": "tests.test_independent_e01_e06.E05SessionRules.test_E05_h_wrong_sender_or_cross_submitted_opening_rejected",
       "status": "pass",
-      "seconds": 0.0002,
+      "seconds": 0.0001,
       "observed": {
         "commit_sender_mismatch": "wrong_bidder",
         "reveal_sender_mismatch": "wrong_bidder",
@@ -334,7 +334,7 @@
       "id": "E05-i",
       "test": "tests.test_independent_e01_e06.E05SessionRules.test_E05_i_ineligible_bidder_rejected",
       "status": "pass",
-      "seconds": 0.0001,
+      "seconds": 0.0002,
       "observed": {
         "commit": "wrong_bidder",
         "reveal": "wrong_bidder",
@@ -354,7 +354,7 @@
       "id": "E05-k",
       "test": "tests.test_independent_e01_e06.E05SessionRules.test_E05_k_invalid_bid_rejected_even_with_matching_commitment",
       "status": "pass",
-      "seconds": 0.0002,
+      "seconds": 0.0001,
       "observed": {
         "outcomes": {
           "5000": "invalid_bid",
@@ -409,7 +409,7 @@
       "id": "E06-a",
       "test": "tests.test_independent_e01_e06.E06NonRevealTiesNoWinner.test_E06_a_highest_bidder_does_not_reveal_winner_changes",
       "status": "pass",
-      "seconds": 0.0002,
+      "seconds": 0.0001,
       "observed": {
         "winner_if_all_reveal": "U02",
         "winner_if_U02_silent": "U03",
