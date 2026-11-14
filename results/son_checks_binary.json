@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "run_kind": "author component checks using synthetic data; not independent E01-E06 validation",
+  "run_started_at_utc": "2026-11-14T00:50:44.941780+00:00",
+  "python_version": "3.13.2",
+  "platform": "Windows-11-10.0.22000-SP0",
+  "git_head": "5fe97906e5c88d1afab0d5c70c244b071e8e0271",
+  "working_tree_dirty": true,
+  "source_sha256": {
+    "examples/__init__.py": "9e957153de3ef1173df1d7b1e7447e013ea0c6c4abb3b06c7714bdc9868a428e",
+    "examples/check_handover.py": "75826a5575d9e9077ee80b1d057be7b3d15c8fa1b22fe6dc971f167e150ddf81",
+    "examples/commitment_demo.py": "abc7d7beed9a231d76cd94b3c642dfd8ab8e897385feae0a9f292dee9e6df073",
+    "experiments/__init__.py": "d9afd269ff275e7446eb6ac5451ac3d490e99d3f8ebab4287009a9dc1f59a5f5",
+    "experiments/guessing.py": "e8c080b9e8adb6195ad552394a473102318e789578db9a49f217a2c9980cb389",
+    "experiments/run_son_checks.py": "35fce4868b9470330c1b2e78cd1cdc9bc4f97ce6fde1f58890e0fa95cdcc3e60",
+    "src/__init__.py": "a1e011c7e6f0b676bc1d3fec9181f05522f99d54b66ede0e2612a2e88dd75843",
+    "src/commitment.py": "fbcf30321d6a9e0bef1ffd42940473d71c506dca7e268ca889e26a59323730fc",
+    "tests/__init__.py": "ed3a5b092594ee98dd118f5cf58a3001e1ebe3b0f520a44bcd7b425d5f886abc",
+    "tests/test_commitment.py": "aef8181ece71b43d613629970c9921f224e54b7476601cca406616232bde1451",
+    "tests/test_guessing.py": "fb40767f8ab4f0f3f8a847bac546a39eccf9849e9710bf0f26b25e04c0f3bcdc",
+    "tests/test_runner.py": "be300c99f80c9d17797644c56e248396afdd851122ed357f755cb48f2b23a91b"
+  },
+  "encoding_id": "m1-length-prefixed-be-v1",
+  "reference_vector_source": "docs/commitment-api.md; binary vector independently checked with .NET SHA-256",
+  "model_status": "Binary handover format implemented from the integration message; docs/model.md is not yet present.",
+  "model_sha256": null,
+  "all_checks_passed": true,
+  "cases": [
+    {
+      "id": "C01-vector",
+      "purpose": "Check the binary integration SHA-256 reference vector",
+      "inputs": {
+        "auction_id": "A01",
+        "bidder_id": "U01",
+        "bid": 100000,
+        "randomness": "00112233445566778899aabbccddeeff",
+        "randomness_kind": "public fixed TEST fixture"
+      },
+      "expected": {
+        "digest": "7b4df9d0ff820790c1ef5c2e89ec7b7c7900525b2bdb526abe0b49e187fd2b71"
+      },
+      "actual": {
+        "digest": "7b4df9d0ff820790c1ef5c2e89ec7b7c7900525b2bdb526abe0b49e187fd2b71"
+      },
+      "passed": true,
+      "limitation": "A known-answer check verifies one encoding/hash vector, not protocol security."
+    },
+    {
+      "id": "C02-valid-opening",
+      "purpose": "Compare an opening with the fixed reference commitment",
+      "inputs": {
+        "auction_id": "A01",
+        "bidder_id": "U01",
+        "bid": 100000,
+        "randomness": "00112233445566778899aabbccddeeff",
+        "randomness_kind": "public fixed TEST fixture",
+        "frozen_commitment": "7b4df9d0ff820790c1ef5c2e89ec7b7c7900525b2bdb526abe0b49e187fd2b71"
+      },
+      "expected": {
+        "hash_matches": true
+      },
+      "actual": {
+        "hash_matches": true
+      },
+      "passed": true,
+      "limitation": "Hash matching alone does not admit a bid; auction rules are a separate layer."
+    },
+    {
+      "id": "E02-changed-bid",
+      "purpose": "Compare an opening with the fixed reference commitment",
+      "inputs": {
+        "auction_id": "A01",
+        "bidder_id": "U01",
+        "bid": 140000,
+        "randomness": "00112233445566778899aabbccddeeff",
+        "randomness_kind": "public fixed TEST fixture",
+        "frozen_commitment": "7b4df9d0ff820790c1ef5c2e89ec7b7c7900525b2bdb526abe0b49e187fd2b71"
+      },
+      "expected": {
+        "hash_matches": false
+      },
+      "actual": {
+        "hash_matches": false
+      },
+      "passed": true,
+      "limitation": "Hash matching alone does not admit a bid; auction rules are a separate layer."
+    },
+    {
+      "id": "E02-changed-r",
+      "purpose": "Compare an opening with the fixed reference commitment",
+      "inputs": {
+        "auction_id": "A01",
+        "bidder_id": "U01",
+        "bid": 100000,
+        "randomness": "10112233445566778899aabbccddeeff",
+        "randomness_kind": "public fixed TEST fixture",
+        "frozen_commitment": "7b4df9d0ff820790c1ef5c2e89ec7b7c7900525b2bdb526abe0b49e187fd2b71"
+      },
+      "expected": {
+        "hash_matches": false
+      },
+      "actual": {
+        "hash_matches": false
+      },
+      "passed": true,
+      "limitation": "Hash matching alone does not admit a bid; auction rules are a separate layer."
+    },
+    {
+      "id": "C03-field-boundaries",
+      "purpose": "Distinguish records that naive concatenation confuses",
+      "inputs": {
+        "identifier_pairs": [
+          [
+            "1",
+            "23"
+          ],
+          [
+            "12",
+            "3"
+          ]
+        ],
+        "bid": 100000,
+        "randomness": "00112233445566778899aabbccddeeff",
+        "randomness_kind": "public fixed TEST fixture"
+      },
+      "expected": {
+        "encoded_records_differ": true
+      },
+      "actual": {
+        "encoded_records_differ": true
+      },
+      "passed": true,
+      "limitation": "This example illustrates field separation; accepted input rules define the encoding."
+    },
+    {
+      "id": "E03-b0-guessing",
+      "purpose": "Enumerate a known small bid domain",
+      "inputs": {
+        "bid_domain": {
+          "minimum": 10000,
+          "maximum_inclusive": 1000000,
+          "step": 10000,
+          "size": 100,
+          "status": "illustrative experiment domain; not a new M1 price rule"
+        },
+        "true_bid": 130000,
+        "target": "953c19a5fd430675a06a0a6e5151f90679db3067c08dd6b0ac854fd048d3a84b",
+        "max_attempts": 100
+      },
+      "expected": {
+        "status": "match",
+        "attempts": 13,
+        "bid": 130000,
+        "randomness": null
+      },
+      "actual": {
+        "status": "match",
+        "attempts": 13,
+        "bid": 130000,
+        "randomness": null
+      },
+      "passed": true,
+      "limitation": "This is an input-guessing demonstration, not a break of SHA-256."
+    },
+    {
+      "id": "E04-weak-r",
+      "purpose": "Enumerate a deliberately small randomness domain in B1",
+      "inputs": {
+        "bid_domain": {
+          "minimum": 10000,
+          "maximum_inclusive": 1000000,
+          "step": 10000,
+          "size": 100,
+          "status": "illustrative experiment domain; not a new M1 price rule"
+        },
+        "true_bid": 130000,
+        "target": "f88110ecab4da645a2b9364111af42b9cdb7217a147cf87834afe7bee5558836",
+        "fixture_r": "00000000000000000000000000000007",
+        "r_domain": "integers 0..15 encoded as 32 lowercase hex digits",
+        "randomness_kind": "weak public-domain TEST configuration, not normal M1",
+        "search_order": "r outer loop, ascending bids inner loop",
+        "max_attempts": 1600
+      },
+      "expected": {
+        "status": "match",
+        "attempts": 713,
+        "bid": 130000,
+        "randomness": "00000000000000000000000000000007"
+      },
+      "actual": {
+        "status": "match",
+        "attempts": 713,
+        "bid": 130000,
+        "randomness": "00000000000000000000000000000007"
+      },
+      "passed": true,
+      "limitation": "Field width remains 128 bits, but only 16 candidate values are possible here."
+    },
+    {
+      "id": "E04-disclosed-r-b1",
+      "purpose": "Guess B1 bids after randomness disclosure",
+      "inputs": {
+        "bid_domain": {
+          "minimum": 10000,
+          "maximum_inclusive": 1000000,
+          "step": 10000,
+          "size": 100,
+          "status": "illustrative experiment domain; not a new M1 price rule"
+        },
+        "true_bid": 130000,
+        "target": "3e8e4a8587a436d8eb9464415e9b5d71cd8112f10002acec6f968225eaef3624",
+        "disclosed_r": "00112233445566778899aabbccddeeff",
+        "randomness_kind": "public fixed TEST fixture",
+        "max_attempts": 100
+      },
+      "expected": {
+        "status": "match",
+        "attempts": 13,
+        "bid": 130000,
+        "randomness": "00112233445566778899aabbccddeeff"
+      },
+      "actual": {
+        "status": "match",
+        "attempts": 13,
+        "bid": 130000,
+        "randomness": "00112233445566778899aabbccddeeff"
+      },
+      "passed": true,
+      "limitation": "Publishing r early removes its protection against this small-domain search."
+    },
+    {
+      "id": "E04-disclosed-r-b2",
+      "purpose": "Guess a context-bound bid when r is known",
+      "inputs": {
+        "bid_domain": {
+          "minimum": 10000,
+          "maximum_inclusive": 1000000,
+          "step": 10000,
+          "size": 100,
+          "status": "illustrative experiment domain; not a new M1 price rule"
+        },
+        "true_bid": 130000,
+        "target": "8a93bd62bf4a7a2083f418d08b8368c7185803c2e46d2720250c769d78981e4c",
+        "auction_id": "A01",
+        "bidder_id": "U02",
+        "disclosed_r": "00112233445566778899aabbccddeeff",
+        "randomness_kind": "public fixed TEST fixture",
+        "max_attempts": 100
+      },
+      "expected": {
+        "status": "match",
+        "attempts": 13,
+        "bid": 130000,
+        "randomness": "00112233445566778899aabbccddeeff"
+      },
+      "actual": {
+        "status": "match",
+        "attempts": 13,
+        "bid": 130000,
+        "randomness": "00112233445566778899aabbccddeeff"
+      },
+      "passed": true,
+      "limitation": "Context binding does not restore hiding if opening randomness is disclosed."
+    },
+    {
+      "id": "E04-normal-r-configuration",
+      "purpose": "Check normal generation and the public payload",
+      "inputs": {
+        "generator": "secrets.token_hex(16)",
+        "auction_id": "A01",
+        "bidder_id": "U03",
+        "bid": 120000,
+        "randomness_kind": "fresh OS-backed randomness; opening not exported"
+      },
+      "expected": {
+        "random_bytes": 16,
+        "opening_matches": true,
+        "public_payload_fields": [
+          "auction_id",
+          "bidder_id",
+          "commitment"
+        ]
+      },
+      "actual": {
+        "random_bytes": 16,
+        "opening_matches": true,
+        "public_payload_fields": [
+          "auction_id",
+          "bidder_id",
+          "commitment"
+        ]
+      },
+      "passed": true,
+      "limitation": "Length and a successful opening do not measure entropy or prove hiding. 2^128 possible r values assumes uniform independent generation; no exhaustive search is run."
+    }
+  ]
+}
