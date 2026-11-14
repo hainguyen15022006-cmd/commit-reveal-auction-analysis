@@ -30,13 +30,22 @@ Status labels are deliberately strict:
 - **Observed (Thành Lê integration rerun):** executed from an isolated archive
   of `origin/codex/auction-m1` commit `3076239…` on Python 3.13.15/Windows 11;
   this is coordinator/integration evidence, not Chúc's independent execution.
-- **Planned:** designed but not independently executed by Chúc.
+- **Observed (Chúc RUN01):** independently designed E01-E06 suite recorded from
+  clean commit `2a1bfe475b9f22cad2eab078e48129544aca24d2` on Python 3.14.2/Windows 11.
+  RUN01 contains 37 passes, zero failures, and zero errors. This review reran
+  the same source on Python 3.13.15/Windows 11 with the same 37/37 outcome.
 
 Evidence categories are kept separate: **A** is Sơn's cryptographic component
 tests and guessing runner; **B** is Thành Lê's coordinator/integration tests and
-demo; **C** would be Chúc's independent suite, which is not currently available;
-and **D** is the conditional theoretical reasoning in `security-comparison.md`.
-Passing A or B is never reported as C or as proof of D.
+demo; **C** is Chúc's independent RUN01 and this review's reproduction; and
+**D** is the conditional theoretical reasoning in `security-comparison.md`.
+Passing A, B, or C is never reported as proof of D.
+
+RUN01 is stored as `results/independent_e01_e06_RUN01.json` on
+`origin/test/independent-e01-e06`. Its independent oracle re-implements the
+documented encoding using `hashlib` and does not import `src.commitment`. All
+seven recorded source SHA-256 values match the files at the recorded clean
+source commit. The result file was added by the following commit `03d0b55…`.
 
 The approved M1 example uses 100 permitted bids from 10000 through 1000000 VND
 in increments of 10000. The coordinator enforces this range and step. E03/E04
@@ -63,7 +72,11 @@ about all real auctions.
   at `T1-1` and reveals at T1 were accepted; settlement at T2 returned
   `Settlement("winner", "U02", 130000)`. The full suite and six-test coordinator
   module passed, and `python -m examples.auction_demo` independently reproduced
-  the same outcome with newly generated r values.
+  the same outcome with newly generated r values. **Observed (Chúc RUN01):** all
+  four cases E01-a..d passed: fixture-r and fresh-r flows both selected U02 at
+  130000 VND, repeat runs reproduced the fixture result, settlement before T2
+  was pending, and the winner paid its own 130000 bid rather than the 120000
+  second-highest bid.
 - **Security interpretation:** Confirms functional composition for one valid
   scenario, not hiding/binding proofs or production fairness.
 - **Limitations:** Does not exercise invalid timing, storage tampering,
@@ -73,7 +86,8 @@ about all real auctions.
   but the recorded byte-level provenance is imperfect.
 - **Executor/evidence source:** Thành Lê integration test
   `test_e01_first_price`, demo, and committed `results/auction_e01.json`, plus
-  this review rerun at `3076239…`. Chúc's independent evidence is unavailable.
+  this review rerun at `3076239…`; Chúc RUN01 E01-a..d at `2a1bfe4…` and this
+  review's 37-test reproduction.
 
 ## E02 — Invalid opening
 
@@ -96,14 +110,17 @@ about all real auctions.
   evidence):** the same two E02 cases passed in the recorded JSON. **Observed
   (Thành Lê integration rerun):** `test_e02_changed_price_and_randomness`
   returned `opening_mismatch` for each alteration, then accepted the correct
-  opening and rejected its repeat as `already_revealed`.
+  opening and rejected its repeat as `already_revealed`. **Observed (Chúc
+  RUN01):** all six E02-a..f cases passed. They accepted the control, rejected
+  five changed bids, all 128 one-bit changes to r, four combined b/r changes,
+  four changed-context samples, and 17 malformed opening/commitment forms.
 - **Security interpretation:** Demonstrates mismatch detection for these inputs.
   It does not prove that no alternative opening or SHA-256 collision exists.
 - **Limitations:** These are specific examples; they do not prove binding or
   exercise a production authentication/storage system.
 - **Executor/evidence source:** Security-analysis review rerun plus Sơn's
-  author-run component evidence and Thành Lê's integration test. None is marked
-  as Chúc's execution.
+  author-run component evidence and Thành Lê's integration test, kept distinct
+  from Chúc's independent RUN01 E02-a..f and its reproduced 37-test run.
 
 ## E03 — Small-domain guessing against B0
 
@@ -123,13 +140,18 @@ about all real auctions.
   match is b=130000 on attempt 13.
 - **Actual result:** **Observed (review rerun):** status `match`, attempt count
   13, recovered bid 130000. **Observed (Sơn author evidence):** identical.
+  **Observed (Chúc RUN01):** E03-a recovered every one of the 100 B0 bids, with
+  130000 at attempt 13 and worst case 100; E03-c confirmed budget 12 stops before
+  the match and budget 13 finds it. E03-b found no match when the B0-only search
+  was applied to 100 M1 commitments or when one wrong r was tried; its own note
+  correctly states that this bounded failure is not evidence of hiding.
 - **Security interpretation:** The work factor follows the small input domain;
   this is an input-guessing demonstration, not a SHA-256 break.
 - **Limitations:** The domain is the approved M1 example configuration, not a
   universal real-auction policy. A match is not generally guaranteed unique
   over arbitrary domains.
 - **Executor/evidence source:** Security-analysis review rerun plus Sơn's
-  author-run component evidence; no Chúc result is available.
+  author-run component evidence; Chúc RUN01 E03-a..c and the reproduced run.
 
 ## E04 — Impact of randomness
 
@@ -138,38 +160,53 @@ about all real auctions.
   and normally generated r.
 - **Inputs:** b=130000 and the same 100-bid domain as E03. Weak r is integer 7
   encoded as `00000000000000000000000000000007`; its public candidate domain is
-  integers 0..15, each encoded as a 32-hex-character field. Disclosed r is
-  `00112233445566778899aabbccddeeff`. Normal M1 calls
-  `secrets.token_hex(16)` and does not export r in the commit payload.
+  integers 0..15, each encoded as a 32-hex-character field. This is Sơn's
+  16-value configuration. Chúc's separate RUN01 weak configuration uses an
+  8-bit domain 0..255 and true r=`0xA7` (decimal 167), with the same 32-hex-digit
+  representation. Disclosed r is `00112233445566778899aabbccddeeff`.
+  Normal M1 calls `secrets.token_hex(16)` and does not export r in the commit
+  payload.
 - **Assumptions/preconditions:** Candidate formats and search order are known.
   For the normal case, the OS CSPRNG supplies uniform, independent randomness
   and the bidder keeps r secret until reveal.
-- **Procedure:** (1) Use the E03 B0 enumeration for no r. (2) For weak B1, try r
-  in order 0..15 as the outer loop and all ascending bids as the inner loop, up
-  to 1600 pairs. (3) With disclosed r, try the 100 bids for B1 and B2 with known
-  correct A/U. (4) For normal B2, prepare a commitment, check r decodes to 16
-  bytes, check the public payload omits b/r, and verify the retained opening. Do
-  not enumerate the 128-bit space.
+- **Procedure:** (1) Use the E03 B0 enumeration for no r. (2) For Sơn's weak B1,
+  try r in order 0..15 as the outer loop and all ascending bids as the inner
+  loop, up to 1600 pairs. Independently repeat with Chúc's 0..255 weak domain,
+  also testing context-bound M1. (3) With disclosed r, try the 100 bids for B1
+  and B2 with known correct A/U. (4) For normal B2, prepare a commitment, check
+  r decodes to 16 bytes, check the public payload omits b/r, and verify the
+  retained opening. Do not enumerate the 128-bit space.
 - **Expected result:** No-r B0 recovers b on attempt 13. Weak-r B1 recovers
-  `(b,r)` on attempt `7*100+13 = 713`. Disclosed-r B1 and B2 recover b on
-  attempt 13. Normal B2 has a 16-byte r, a public payload containing only A/U/c,
-  and a valid retained opening; no recovery claim is expected or attempted.
+  `(b,r)` on attempt `7*100+13 = 713` in Sơn's configuration. Chúc's distinct
+  8-bit configuration recovers `(b,r)` on attempt `167*100+13 = 16713`.
+  Disclosed-r B1 and B2 recover b on attempt 13. Normal B2 has a 16-byte r, a
+  public payload containing only A/U/c, and a valid retained opening; no
+  recovery claim is expected or attempted.
 - **Actual result:** **Observed (review rerun):** all expected outputs occurred;
   target weak-B1 digest was `f88110ec…5558836`, disclosed-B1 was
   `3e8e4a85…aef3624`, and disclosed-B2 was `8a93bd62…981e4c`.
   The runner reported 16 bytes, a valid opening, and public fields A/U/c for the
   normal configuration. **Observed (Sơn author evidence):** identical expected
   comparisons passed. The unchanged component runner also passed 10/10 when
-  rerun from Thành Lê's integrated commit.
-- **Security interpretation:** A 128-bit field can have only four bits of entropy
-  in the 16-value weak experiment. Disclosure removes r from the observer's
-  search. With a uniform, independent, secret 128-bit r, exhaustive joint search
-  is intended to be infeasible, but the structural check does not measure
-  entropy or prove hiding.
+  rerun from Thành Lê's integrated commit. **Observed (Chúc RUN01):** all four
+  E04-a..d cases passed. E04-b recovered both B1 and context-bound M1 under the
+  256-value weak-r configuration on attempt 16713. E04-d recovered 130000 with
+  disclosed r on attempt 13. E04-c recorded 5000 generated values without a
+  duplicate and zero hits in 20000 bounded guesses; these samples are not proof
+  of entropy or hiding.
+- **Security interpretation:** A 128-bit field has at most four bits of entropy
+  in Sơn's 16-value weak experiment and eight bits in Chúc's 256-value weak
+  experiment. Their 713 and 16713 attempt counts follow different configured
+  domains and true-r positions; neither is a universal attack complexity.
+  Disclosure removes r from the observer's search. With a uniform, independent,
+  secret 128-bit r, exhaustive joint search is intended to be infeasible, but
+  the structural check does not measure entropy or prove hiding.
 - **Limitations:** No full-space search or statistical CSPRNG evaluation was run.
-  Hiding also depends on the hash-function model and secrecy of the opening.
+  RUN01's single-run throughput/extrapolation is environment-dependent and is
+  not a cryptographic lower bound. Hiding also depends on the hash-function
+  model, endpoint security, and secrecy of the opening.
 - **Executor/evidence source:** Security-analysis review rerun plus Sơn's
-  author-run component evidence; no Chúc result is available.
+  author-run component evidence; Chúc RUN01 E04-a..d and the reproduced run.
 
 ## E05 — Protocol-rule tests
 
@@ -198,6 +235,11 @@ about all real auctions.
   simulation evidence that the duplicate did not replace it. Settlement before
   T2 was `pending`. A separate price test accepted both endpoints and rejected
   9999, 1010000, 10001, `True`, and `10000.0` as `invalid_bid`.
+  **Observed (Chúc RUN01):** all 14 E05-a..n cases passed, independently covering
+  duplicate preservation, both deadline boundaries, retry rules, wrong A,
+  sender mismatch, cross-submitted openings, ineligible/no-commit bidders,
+  invalid price values and types, malformed commitments, first-valid-reveal
+  retention, backwards time, and invalid auction configuration guards.
 - **Security interpretation:** These checks protect protocol state and context;
   they are distinct from SHA-256's properties.
 - **Limitations:** A simulated clock/authentication/storage layer does not prove
@@ -207,8 +249,8 @@ about all real auctions.
   production data.
 - **Executor/evidence source:** Thành Lê's
   `test_e05_deadlines_identity_and_duplicate_commit` and
-  `test_e05_price_range_and_step`, rerun at commit `3076239…`. Chúc's
-  independent evidence remains unavailable.
+  `test_e05_price_range_and_step`, rerun at commit `3076239…`; Chúc RUN01
+  E05-a..n and the reproduced run.
 
 ## E06 — Settlement edge cases
 
@@ -231,7 +273,12 @@ about all real auctions.
   130000 but did not reveal; U01 and U02 both revealed 120000, and settlement
   selected lexicographically smaller `U01` at 120000. In the no-valid-reveal
   test, an altered bid was rejected as `opening_mismatch` and settlement returned
-  `Settlement("no_winner")`. Both tests passed.
+  `Settlement("no_winner")`. Both tests passed. **Observed (Chúc RUN01):** all
+  six E06-a..f cases passed. They observed U03 winning at 120000 when top bidder
+  U02 stayed silent, lexicographic ties independent of arrival order, no winner
+  for silence or all-wrong openings, a sole valid revealer winning at its own
+  bid, settlement remaining unchanged after a late reveal, and an uncorrected
+  invalid opening being treated like non-reveal.
 - **Security interpretation:** Defines deterministic availability/fairness
   behavior but does not compel revelation or payment and does not prevent a
   bidder from strategically withholding an opening.
@@ -239,16 +286,18 @@ about all real auctions.
   but the finalized PDFs remain unavailable. Production liveness, storage
   tampering, and economic incentives are outside this functional test.
 - **Executor/evidence source:** Thành Lê's `test_e06_non_reveal_and_tie` and
-  `test_e06_no_valid_reveal`, rerun at commit `3076239…`. Chúc's independent
-  evidence remains unavailable.
+  `test_e06_no_valid_reveal`, rerun at commit `3076239…`; Chúc RUN01 E06-a..f
+  and the reproduced run.
 
 ## Execution handoff
 
 E01, E02, E05, and E06 now have reproducible Thành Lê integration evidence;
 E02-E04 also have repeatable Sơn component/reviewer evidence. The complete
 integrated suite ran 50 tests successfully, including six coordinator tests.
-These results remain author/integration evidence, not Chúc's independent
-execution. Future independent evidence should record the exact command,
-coordinator and commitment revisions, Python/platform, full synthetic inputs,
-expected and actual outputs, exit status, and unmodified logs.
+Chúc's separately designed RUN01 adds 37 independent passing cases across all
+E01-E06, and this review reproduced that suite. The experiment design and
+available component, integration, and independent evidence are now complete for
+technical report preparation. Finite tests still do not prove the conditional
+security arguments, and future reruns should retain exact source revisions,
+platform details, full synthetic inputs, exit status, and unmodified logs.
 

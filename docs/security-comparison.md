@@ -16,6 +16,12 @@ means B2 together with the separate one-commit, deadline, freeze,
 reveal-validation, and settlement rules. The hash function alone is not the
 complete auction.
 
+Dương's `docs/duong-threat-model-review.md` at `1e943697…` is a working technical
+reference, not a final team-approved report section. Its assumptions about
+simulated identity/time, trusted in-memory records, endpoint secrecy, non-reveal,
+organizer power, and finite-test limits are consistent with this analysis; no
+material contradiction was found.
+
 ## Correctness
 
 1. **Claimed property.** If an honest bidder commits and later presents exactly
@@ -34,10 +40,13 @@ complete auction.
    `7b4df9d0…2b71`. The component review passed 44 tests and 10 runner checks.
    The integrated commit passed 50 tests, including all six coordinator tests;
    E01 selected U02 at 130000 VND, and E05/E06 produced the documented boundary,
-   identity, non-reveal, tie, and no-winner behavior.
-5. **What remains unproven.** No Chúc independent run is available. Tests cover
-   examples, not every input, implementation fault, SHA-256 correctness in all
-   environments, production authentication/time/storage, or organizer honesty.
+   identity, non-reveal, tie, and no-winner behavior. Chúc RUN01 independently
+   passed 37/37 cases across E01-E06, with a separate specification-based oracle;
+   this review reproduced the same 37/37 result from its recorded source commit.
+5. **What remains unproven.** Tests cover examples, not every input,
+   implementation fault, SHA-256 correctness in all environments, production
+   authentication/time/storage, or organizer honesty. An independent passing
+   suite improves confidence in functional behavior but is not a formal proof.
 
 Cryptographic correctness and auction execution correctness are different
 claims. The former was observed when canonical openings matched their digests;
@@ -63,7 +72,10 @@ coordinator's simulated identity, monotonic time, and preserved in-memory state.
    16-value weak-r B1 case recovered the opening on attempt 713; disclosed-r B1
    and B2 recovered the bid on attempt 13. Normal preparation used
    `secrets.token_hex(16)`, produced 16 bytes, omitted b/r from the public
-   payload, and later opened correctly.
+   payload, and later opened correctly. Independently, RUN01 recovered B1 and M1
+   under a different 256-value weak-r domain on attempt 16713 and recovered a
+   disclosed-r bid on attempt 13. Its bounded normal-r samples found no hits, a
+   result explicitly treated as non-proof.
 5. **What remains unproven.** The normal structural check does not measure
    entropy, exclude side channels, or prove hiding. No exhaustive 128-bit search
    was attempted, and failing to find a candidate would not itself prove
@@ -71,6 +83,11 @@ coordinator's simulated identity, monotonic time, and preserved in-memory state.
 
 Collision resistance alone does not imply hiding: deterministic B0 uses
 SHA-256 yet is guessable because its input domain is small.
+
+The weak-r results are not interchangeable complexity estimates. Sơn's true
+r=7 in a 16-value domain gives `7*100+13 = 713`; Chúc's true r=167 in a
+256-value domain gives `167*100+13 = 16713`. Both show that encoded 128-bit width
+does not create entropy when selection comes from a small known set.
 
 ## Binding
 
@@ -89,7 +106,10 @@ SHA-256 yet is guessable because its input domain is small.
    pairs and rejects tested changes to b, r, A, and U. The source uses the full
    SHA-256 digest and strict representations. In integration, a duplicate commit
    was rejected and the original stored commitment subsequently opened
-   successfully, while no commit was accepted at or after T1.
+   successfully, while no commit was accepted at or after T1. RUN01 independently
+   rejected five changed-bid samples, 128 single-bit r changes, four combined
+   changes, four context changes, and cross-submitted openings; its duplicate
+   case also retained and later accepted the first opening.
 5. **What remains unproven.** A finite test set does not prove binding or the
    absence of collisions. No formal reduction, cryptanalysis, persistent
    immutable database, or independent audit mechanism was evaluated. Binding
@@ -147,6 +167,11 @@ precedes the later request checks, even a rejected request advances simulation
 time; this is safe only under the stated trusted-scenario assumption and would
 be an availability risk if callers controlled t.
 
+Dương's review likewise found no separate privileged log-tampering experiment,
+signed receipt, or independently anchored audit record. Ordinary API rejection
+of a duplicate is therefore evidence about the coordinator path, not evidence
+that a malicious organizer cannot rewrite memory or history.
+
 ## Non-reveal, fairness, and availability limits
 
 A valid commitment does not force its owner to reveal. Under M1 a non-revealer
@@ -154,6 +179,11 @@ is excluded, allowing the highest remaining valid reveal to win, but strategic
 withholding can still affect the outcome. The commitment also does not compel
 payment, prevent collusion, guarantee bidder participation, or hide metadata.
 The preannounced tie rule provides determinism, not economic fairness.
+
+RUN01 E06-a observed the winner changing from U02 to U03 when U02 stayed silent.
+As Dương notes, this demonstrates rule behavior and lack of forced reveal; it
+does not establish why the bidder withheld, whether withholding was profitable,
+or whether collusion occurred.
 
 An organizer or network can censor commits/reveals, delay messages across a
 deadline, delete records, refuse settlement, or make the service unavailable.
@@ -189,10 +219,14 @@ runtime, or the complete auction.
   selected U02 at 130000 VND; E05 observed price, duplicate, identity, deadline,
   and pending-settlement rules; E06 observed non-reveal exclusion,
   lexicographic tie-breaking, and no winner after no valid reveal.
+- Chúc RUN01 recorded 37/37 independent passes (E01=4, E02=6, E03=3, E04=4,
+  E05=14, E06=6), zero failures and zero errors at clean source commit
+  `2a1bfe4…`. Its seven-file SHA-256 manifest matched that commit byte-for-byte,
+  and the documented command reproduced 37/37 passes in this review.
 
-The first four observations are component-level reviewer/Sơn evidence; the last
-is Thành Lê coordinator/integration evidence. None is Chúc's independent
-execution. The committed E01 JSON's auction/demo source hashes reflect CRLF
+The first four observations are component-level reviewer/Sơn evidence; the
+50-test result is Thành Lê coordinator/integration evidence; RUN01 is Chúc's
+independent evidence. The committed E01 JSON's auction/demo source hashes reflect CRLF
 bytes rather than the LF-normalized commit, but rerunning the exact commit
 reproduced its settlement result.
 
@@ -203,7 +237,9 @@ the small-domain/weak-r conclusions, and functional M1 execution for the tested
 E01/E02/E05/E06 cases. The accessible approved model confirms the binary
 encoding, example price domain, boundaries, and tie rule. It does not support a
 claim that hiding or binding has been proven, that simulated records are
-immutable, or that the auction is fair and available in production. Final report
-use remains conditional on Chúc's independent results; the finalized PDFs also
+immutable, or that the auction is fair and available in production. The
+component, integration, independent-test, and threat-model evidence needed
+for technical report preparation is now available. This does not remove the
+conditional assumptions or replace final team review; the finalized PDFs also
 remain unavailable for direct cross-checking.
 

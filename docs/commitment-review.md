@@ -123,6 +123,8 @@ branch files and every hash matched.
 | `python -m examples.auction_demo` | Exit 0; three valid reveals and first-price winner | Exit 0; `U02` won at 130000 VND | Pass |
 | `python -m examples.check_handover` | Exit 0; eight handover checks pass | Exit 0; 8/8 `PASS` lines | Pass |
 | `python -m experiments.run_son_checks --output <temporary-path>/son-checks.json` at integrated commit | Exit 0; 10/10 component checks pass | Exit 0; 10/10 passed | Pass |
+| `python -m unittest tests.test_independent_e01_e06 -v` at Chúc source commit `2a1bfe4…` | Exit 0; 37 independent cases pass | Exit 0; 37/37 passed in 0.225 s | Pass |
+| `python -m experiments.run_independent_tests --output <temporary-path>/RERUN.json --run-id REVIEW-RERUN --runner "Security-analysis review"` | Exit 0; runner records the same 37 passes | Exit 0; 37 passes, zero failures/errors | Pass |
 
 The rerun observed a valid opening, rejection of a modified bid and modified r,
 distinct encoding of ambiguous identifier pairs, B0 recovery of 130000 VND on
@@ -147,6 +149,16 @@ the same text. This is a line-ending provenance defect, not an observed logic
 difference; the result is therefore supported primarily by the successful rerun
 from commit `3076239…`, not by claiming all recorded byte hashes match.
 
+Chúc's committed RUN01 records Python 3.14.2/Windows 11, clean source commit
+`2a1bfe475b9f22cad2eab078e48129544aca24d2`, and 37/37 passes across E01-E06.
+Its oracle rebuilds the documented M1/B0/B1 byte strings using `hashlib` and
+does not import `src.commitment`; the tests compare that separate oracle with
+the code under test. All seven recorded source hashes matched the recorded
+commit byte-for-byte. The reproduction above used Python 3.13.15/Windows 11 and
+produced the same pass distribution. This is stronger independent functional
+evidence for the encoding and tested openings, but finite samples still do not
+prove hiding, binding, collision resistance, or entropy.
+
 ## Background consistency
 
 `report/background_en.md` is technically consistent with the reviewed M1
@@ -157,6 +169,15 @@ unambiguous encoding plus a fixed commitment record and a hash assumption. Its
 random-oracle statement is presented as an assumption, not as a proof that
 SHA-256 is an ideal random oracle. No rewrite was made. This review did not
 independently audit the bibliographic references.
+
+Dương's working threat-model review at `1e943697…` is consistent with the
+cryptographic responsibility boundary recorded here. It treats authentication
+and time as simulated inputs, stored commitments as trusted in-memory state,
+randomness secrecy as an endpoint assumption, and finite test results as
+functional evidence rather than security proofs. It also confirms that no
+independently anchored organizer-tampering evidence is present. No technical
+contradiction with this review was found; the document remains a draft for team
+review rather than a finalized authority.
 
 ## Limits and open dependencies
 
@@ -172,7 +193,8 @@ independently audit the bibliographic references.
   exposing caller-chosen t would create an availability/deadline risk.
 - The committed E01 evidence has the CRLF/LF source-hash discrepancy described
   above; the session rerun from the exact committed ref passed.
-- No evidence from Chúc's independent suite or Hoàng Anh's rerun is available.
+- Chúc's RUN01 is now available and reproduced. A separate Hoàng Anh rerun is
+  not part of the evidence inspected here.
 - Passing examples support functional correctness for those inputs. They do not
   prove hiding, binding, collision resistance, entropy, or end-to-end fairness.
 
