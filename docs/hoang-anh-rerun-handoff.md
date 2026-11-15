@@ -37,8 +37,9 @@ Outcome: 87 unit tests passed on `test/independent-e01-e06`; 50 unit tests passe
 demo reported U02 as winner at VND 130,000; the component runner reported 10/10
 checks passed. No step required the original authors' machines.
 
-`results/RERUN_HA01.sha256` lists the SHA-256 of the three rerun files. Check
-them with `sha256sum -c results/RERUN_HA01.sha256` (Git Bash) before citing them.
+`results/RERUN_HA01.sha256` lists the SHA-256 of the three rerun files as stored
+in Git with LF line endings. From the repository root, check them with
+`cd results && sha256sum -c RERUN_HA01.sha256` (Git Bash) before citing them.
 
 ## 3. Source consistency
 
