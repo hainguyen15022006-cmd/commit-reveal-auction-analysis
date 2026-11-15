@@ -137,3 +137,5 @@ All repository links are pinned to the reviewed snapshot so later branch changes
 - Assignment document supplied by Dương: `04_Phan_cong_bo_sung_code_giu_nguyen_M1.pdf`, especially pages 4–7, for responsibilities, review requirements and report allocation.
 
 This handoff provides scoped interpretation and review material, not a replacement for Công Thành's formal security argument or Chúc's independent testing.
+
+...
